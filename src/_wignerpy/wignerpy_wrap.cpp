@@ -32,23 +32,67 @@ PyObject *wigner3j_vec_wrap(PyObject *self, PyObject *args){
     PyArrayObject *op = NULL; // output array
     PyObject *rv;
     double l1, l2, m1, m2, m3;
-    
+
     //parse inputs
     if (!PyArg_ParseTuple(args, "dddd", &l1, &l2, &m1, &m2))
         return NULL;
     m3 = - m1 - m2;
-    
+
     //C++ calculation
     std::vector<double> result = WignerSymbols::wigner3j(l1, l2, m3, m1, m2);
-    
-        
+
+
     // allocate output op array
     npy_intp dims[1] = {result.size()};
     op = (PyArrayObject *) PyArray_SimpleNew(1, dims, PyArray_DOUBLE);
 
     CHK_NULL(op);
 
-   
+
+    //copy to op array
+    for (uint n = 0; n < result.size(); n++) {
+        ((double *) PyArray_GETPTR1(op,n))[0] = result[n];
+    }
+
+
+    // Make sure to DECREF when using Py_BuildValue() with objects!!
+    rv = Py_BuildValue("O", PyArray_Return(op));
+    Py_DECREF(op);
+    return rv;
+}
+
+PyObject *wigner6j_wrap(PyObject *self, PyObject *args){//NOTE: do not take the l and m synbols here literally! They are just wrappers. For actual physical meaning for these 6j symbols, ask Joey Dumont, who's the author of the C++ codes.
+    double l1, l2, l3, m1, m2, m3;
+
+    if (!PyArg_ParseTuple(args, "dddddd", &l1, &l2, &l3, &m1, &m2, &m3))
+        return NULL;
+    double result = WignerSymbols::wigner6j(l1, l2, l3, m1, m2, m3);
+    //cout << a << endl; cout.flush();
+    return Py_BuildValue("d", result);
+}
+
+
+
+PyObject *wigner6j_vec_wrap(PyObject *self, PyObject *args){//NOTE: do not take the l and m synbols here literally! They are just wrappers. For actual physical meaning for these 6j symbols, ask Joey Dumont, who's the author of the C++ codes.
+    PyArrayObject *op = NULL; // output array
+    PyObject *rv;
+    double l1, l2, m1, m2, m3;
+
+    //parse inputs
+    if (!PyArg_ParseTuple(args, "ddddd", &l1, &l2, &m1, &m2, &m3))
+        return NULL;
+
+    //C++ calculation
+    std::vector<double> result = WignerSymbols::wigner6j(l1, l2, m1, m2, m3);
+
+
+    // allocate output op array
+    npy_intp dims[1] = {result.size()};
+    op = (PyArrayObject *) PyArray_SimpleNew(1, dims, PyArray_DOUBLE);
+
+    CHK_NULL(op);
+
+
     //copy to op array
     for (uint n = 0; n < result.size(); n++) {
         ((double *) PyArray_GETPTR1(op,n))[0] = result[n];
@@ -62,11 +106,15 @@ PyObject *wigner3j_vec_wrap(PyObject *self, PyObject *args){
 }
 
 // Module methods
-static PyMethodDef omnical_methods[] = {
+static PyMethodDef wignerpy_methods[] = {
     {"wigner3j", (PyCFunction) wigner3j_wrap, METH_VARARGS,
         "Return the wigner 3j symbol of j1, j2, j3, m1, m2, m3."},
     {"wigner3jvec", (PyCFunction) wigner3j_vec_wrap, METH_VARARGS,
         "Return the wigner 3j symbol of all non-zero j3 in a numpy array given j1, j2, m1, m2."},
+    {"wigner6j", (PyCFunction) wigner6j_wrap, METH_VARARGS,
+        "Return the wigner 6j symbol of j1, j2, j3, j4, j5, j6."},
+    {"wigner6jvec", (PyCFunction) wigner6j_vec_wrap, METH_VARARGS,
+        "Return the wigner 6j symbol of all non-zero j1 in a numpy array given j2, j3, j4, j5, j6."},
     //{"redcal", (PyCFunction)redcal_wrap, METH_VARARGS | METH_KEYWORDS,
         //"redcal(data,calpar,info,additivein,uselogcal=1,removedegen=0,maxiter=20,stepsize=.3,conv=.001)\nRun redundant calibration on data (3D array of complex floats)."},
 
@@ -79,7 +127,7 @@ static PyMethodDef omnical_methods[] = {
 
 PyMODINIT_FUNC init_wignerpy(void) {
     PyObject* m;
-    m = Py_InitModule3("_wignerpy", omnical_methods,
+    m = Py_InitModule3("_wignerpy", wignerpy_methods,
     "Wrapper for wignerSymbol C++ code (C++ authored by Joey Dumont).");
 
     import_array();
