@@ -99,7 +99,7 @@ std::vector<double> wigner3j(double l2, double l3,
 				// We check if we are overflowing.
 				if (std::fabs(thrcof[i])>srhuge)
 				{
-					std::cout << "We renormalized the forward recursion." << std::endl;
+					//std::cout << "We renormalized the forward recursion." << std::endl;
 					for (std::vector<double>::iterator it = thrcof.begin(); it != thrcof.begin()+i; ++it)
 					{
 						*it /= srhuge;
@@ -155,7 +155,7 @@ std::vector<double> wigner3j(double l2, double l3,
 					// We check if we are overflowing.
 					if (std::fabs(thrcof[j]>srhuge))
 					{
-						std::cout << "We renormalized the backward recursion." << std::endl;
+						//std::cout << "We renormalized the backward recursion." << std::endl;
 						for (std::vector<double>::iterator it = thrcof.begin()+j; it != thrcof.end(); ++it)
 						{
 							*it /= srhuge;
@@ -319,7 +319,7 @@ std::vector<double> wigner6j(double l2, double l3,
 				// We check if we are overflowing.
 				if (std::fabs(sixcof[i]>srhuge))
 				{
-					std::cout << "We renormalized the forward recursion." << std::endl;
+					//std::cout << "We renormalized the forward recursion." << std::endl;
 					for (std::vector<double>::iterator it = sixcof.begin(); it != sixcof.begin()+i; ++it)
 					{
 						*it /= srhuge;
@@ -375,7 +375,7 @@ std::vector<double> wigner6j(double l2, double l3,
 					// We check if we are overflowing.
 					if (std::fabs(sixcof[j]>srhuge))
 					{
-						std::cout << "We renormalized the backward recursion." << std::endl;
+						//std::cout << "We renormalized the backward recursion." << std::endl;
 						for (std::vector<double>::iterator it = sixcof.begin()+j; it != sixcof.end(); ++it)
 						{
 							*it /= srhuge;

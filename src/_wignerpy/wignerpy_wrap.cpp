@@ -15,13 +15,24 @@
 | |\/| |/ _ \ / _` | | | | |/ _ \ | '_ ` _ \ / _ \ __| '_ \ / _ \ / _` / __|
 | |  | | (_) | (_| | |_| | |  __/ | | | | | |  __/ |_| | | | (_) | (_| \__ \
 |_|  |_|\___/ \__,_|\__,_|_|\___| |_| |_| |_|\___|\__|_| |_|\___/ \__,_|___/ */
-
+PyObject *wigner3j_test(PyObject *self, PyObject *args){
+    //cout << a << endl; cout.flush();
+    return Py_BuildValue("d", WignerSymbols::wigner3j( 827,  1020,  1570,   590,   902, -1492));
+}
 PyObject *wigner3j_wrap(PyObject *self, PyObject *args){
     double l1, l2, l3, m1, m2, m3;
 
     if (!PyArg_ParseTuple(args, "dddddd", &l1, &l2, &l3, &m1, &m2, &m3))
         return NULL;
-    double result = WignerSymbols::wigner3j(l1, l2, l3, m1, m2, m3);
+        
+    double result = 0;
+    //if (l3 >= l2 and l3 >= l1){
+        //result = WignerSymbols::wigner3j(l3, l1, l2, m3, m1, m2);
+    //}else if(l2 >= l3 and l2 >= l1){
+        //result = WignerSymbols::wigner3j(l2, l3, l1, m2, m3, m1);
+    //}else{
+        result = WignerSymbols::wigner3j(l1, l2, l3, m1, m2, m3);
+    //}
     //cout << a << endl; cout.flush();
     return Py_BuildValue("d", result);
 }
@@ -107,6 +118,8 @@ PyObject *wigner6j_vec_wrap(PyObject *self, PyObject *args){//NOTE: do not take 
 
 // Module methods
 static PyMethodDef wignerpy_methods[] = {
+    {"test", (PyCFunction) wigner3j_test, METH_NOARGS,
+        "Return the wigner 3j symbol of j1, j2, j3, m1, m2, m3."},
     {"wigner3j", (PyCFunction) wigner3j_wrap, METH_VARARGS,
         "Return the wigner 3j symbol of j1, j2, j3, m1, m2, m3."},
     {"wigner3jvec", (PyCFunction) wigner3j_vec_wrap, METH_VARARGS,
