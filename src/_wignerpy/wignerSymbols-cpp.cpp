@@ -5,7 +5,8 @@
  * https://www.gnu.org/licenses/lgpl.html.              -/
  ********************************************************/ 
 
-#include "wignerSymbols.h"
+#include "wignerSymbols/commonFunctions.h"
+#include "wignerSymbols/wignerSymbols-cpp.h"
 
 namespace WignerSymbols {
 std::vector<double> wigner3j(double l2, double l3,
@@ -49,7 +50,7 @@ std::vector<double> wigner3j(double l2, double l3,
 		thrcof[0] = srtiny;
 
 		// From now on, we check the variation of |alpha(l1)|. 
-		double alphaOld, alphaNew, beta, l1(l1min);
+		double alphaNew, l1(l1min);
 		if (l1min==0.0)
 			alphaNew = -(m3-m2+2.0*wigner3j_auxB(l1,l2,l3,m1,m2,m3))/wigner3j_auxA(1.0,l2,l3,m1,m2,m3);
 		else
@@ -99,10 +100,11 @@ std::vector<double> wigner3j(double l2, double l3,
 				// We check if we are overflowing.
 				if (std::fabs(thrcof[i])>srhuge)
 				{
-					//std::cout << "We renormalized the forward recursion." << std::endl;
+					std::cout << "We renormalized the forward recursion." << std::endl;
 					for (std::vector<double>::iterator it = thrcof.begin(); it != thrcof.begin()+i; ++it)
 					{
-						*it /= srhuge;
+						if (std::fabs(*it) < srtiny) *it = 0;
+						else *it /= srhuge;
 					}
 				}
 	
@@ -110,7 +112,7 @@ std::vector<double> wigner3j(double l2, double l3,
 				// the classical region. If we have, the second if 
 				// sets alphaVar to true and we break this loop at the
 				// next iteration because we need thrcof(l1mid+1) to 
-				// compute the scalar.
+				// compute the scalar lambda.
 				if (alphaVar) break;
 
 				if (std::fabs(alphaNew)-std::fabs(alphaOld)>0.0)
@@ -155,10 +157,11 @@ std::vector<double> wigner3j(double l2, double l3,
 					// We check if we are overflowing.
 					if (std::fabs(thrcof[j]>srhuge))
 					{
-						//std::cout << "We renormalized the backward recursion." << std::endl;
+						std::cout << "We renormalized the backward recursion." << std::endl;
 						for (std::vector<double>::iterator it = thrcof.begin()+j; it != thrcof.end(); ++it)
 						{
-							*it /= srhuge;
+							if (std::fabs(*it) < srtiny) *it = 0;
+							else *it /= srhuge;
 						}
 					}
 			
@@ -183,6 +186,7 @@ std::vector<double> wigner3j(double l2, double l3,
 	{
 		sum += (2.0*(l1min+k)+1.0)*thrcof[k]*thrcof[k];
 	}
+
 	double c1 = pow(-1.0,l2-l3-m1)*sgn(thrcof[size-1])/sqrt(sum);
 
 	for (std::vector<double>::iterator it = thrcof.begin(); it != thrcof.end(); ++it)
@@ -267,7 +271,7 @@ std::vector<double> wigner6j(double l2, double l3,
 		sixcof[0] = srtiny;
 
 		// From now on, we check the variation of |alpha(l1)|.
-		double alphaOld, alphaNew, beta, l1(l1min);
+		double alphaNew, l1(l1min);
 
 		if (l1min==0)
 			alphaNew = -(l2*(l2+1.0)+l3*(l3+1.0)+l5*(l5+1.0)+l6*(l6+1.0)-2.0*l4*(l4+1.0))/wigner6j_auxA(1.0,l2,l3,l4,l5,l6);
@@ -297,7 +301,7 @@ std::vector<double> wigner6j(double l2, double l3,
 			sixcof[1] = alphaNew*sixcof[0];
 	
 			// We compute the rest of the recursion.
-			int i = 1;
+			unsigned int i = 1;
 			bool alphaVar = false;
 			do
 			{
@@ -319,7 +323,7 @@ std::vector<double> wigner6j(double l2, double l3,
 				// We check if we are overflowing.
 				if (std::fabs(sixcof[i]>srhuge))
 				{
-					//std::cout << "We renormalized the forward recursion." << std::endl;
+					std::cout << "We renormalized the forward recursion." << std::endl;
 					for (std::vector<double>::iterator it = sixcof.begin(); it != sixcof.begin()+i; ++it)
 					{
 						*it /= srhuge;
@@ -356,7 +360,7 @@ std::vector<double> wigner6j(double l2, double l3,
 				sixcof[size-2] = alphaNew*sixcof[size-1];
 	
 				// We compute the rest of the backward recursion.
-				int j = size-2;
+				unsigned int j = size-2;
 				do
 				{
 					// Bookkeeping
@@ -375,7 +379,7 @@ std::vector<double> wigner6j(double l2, double l3,
 					// We check if we are overflowing.
 					if (std::fabs(sixcof[j]>srhuge))
 					{
-						//std::cout << "We renormalized the backward recursion." << std::endl;
+						std::cout << "We renormalized the backward recursion." << std::endl;
 						for (std::vector<double>::iterator it = sixcof.begin()+j; it != sixcof.end(); ++it)
 						{
 							*it /= srhuge;
@@ -399,7 +403,7 @@ std::vector<double> wigner6j(double l2, double l3,
 
 	// We compute the overall factor.
 	double sum = 0.0;
-	for (int k=0;k<size;k++)
+	for (unsigned int k=0;k<size;k++)
 	{
 		sum += (2.0*(l1min+k)+1.0)*(2.0*l4+1.0)*sixcof[k]*sixcof[k];
 	}
