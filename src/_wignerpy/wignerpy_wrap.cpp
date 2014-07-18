@@ -26,13 +26,17 @@ PyObject *wigner3j_wrap(PyObject *self, PyObject *args){
         return NULL;
         
     double result = 0;
-    //if (l3 >= l2 and l3 >= l1){
-        //result = WignerSymbols::wigner3j(l3, l1, l2, m3, m1, m2);
-    //}else if(l2 >= l3 and l2 >= l1){
-        //result = WignerSymbols::wigner3j(l2, l3, l1, m2, m3, m1);
-    //}else{
+    if (l3 >= l2 and l3 >= l1){
+        result = WignerSymbols::wigner3j(l3, l1, l2, m3, m1, m2);
+    }else if(l2 >= l3 and l2 >= l1){
+        result = WignerSymbols::wigner3j(l2, l3, l1, m2, m3, m1);
+    }else{
         result = WignerSymbols::wigner3j(l1, l2, l3, m1, m2, m3);
-    //}
+    }
+    if (result == 0){
+        PyErr_Format(PyExc_ValueError, "Either the combination of input quantum numbers are not physical, or you have hit the region of large quantum numbers where this code shamefully cannot handle.");
+        return NULL;
+    }
     //cout << a << endl; cout.flush();
     return Py_BuildValue("d", result);
 }
@@ -51,8 +55,10 @@ PyObject *wigner3j_vec_wrap(PyObject *self, PyObject *args){
 
     //C++ calculation
     std::vector<double> result = WignerSymbols::wigner3j(l1, l2, m3, m1, m2);
-
-
+    if (result[0] == 0){
+        PyErr_Format(PyExc_ValueError, "Either the combination of input quantum numbers are not physical, or you have hit the region of large quantum numbers where this code shamefully cannot handle.");
+        return NULL;
+    }
     // allocate output op array
     npy_intp dims[1] = {result.size()};
     op = (PyArrayObject *) PyArray_SimpleNew(1, dims, PyArray_DOUBLE);
