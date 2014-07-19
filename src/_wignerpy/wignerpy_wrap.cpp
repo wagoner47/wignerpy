@@ -33,10 +33,10 @@ PyObject *wigner3j_wrap(PyObject *self, PyObject *args){
     //}else{
         result = WignerSymbols::wigner3j(l1, l2, l3, m1, m2, m3);
     //}
-    if (result == 0){
-        PyErr_Format(PyExc_ValueError, "Either the combination of input quantum numbers (%d, %d, %d, %d, %d, %d) are not physical, or you have hit the region of large quantum numbers where this code shamefully cannot handle.", (int)l1, (int)l2, (int)l3, (int)m1, (int)m2, (int)m3);
-        return NULL;
-    }
+    //if (result == 0){
+        //PyErr_Format(PyExc_ValueError, "Either the combination of input quantum numbers (%d, %d, %d, %d, %d, %d) are not physical, or you have hit the region of large quantum numbers where this code shamefully cannot handle.", (int)l1, (int)l2, (int)l3, (int)m1, (int)m2, (int)m3);
+        //return NULL;
+    //}
     //cout << a << endl; cout.flush();
     return Py_BuildValue("d", result);
 }
