@@ -1,1 +1,1 @@
-import _wignerpy
+from . import _wignerpy
